@@ -41,7 +41,7 @@ if st.button("クチコミ案を作成する"):
                 result = response.json()
                 
                 # 結果の表示（Difyの出力を表示）
-                review_text = result['data']['outputs']['text'] # テンプレートノードの出力を取得
+                review_text = result['data']['outputs']['llm_output'] # テンプレートノードの出力を取得
                 st.success("クチコミ案が完成しました！")
                 st.code(review_text, language=None) # コピーしやすい枠で表示
                 st.info("右上のボタンでコピーして、Googleマップへ貼り付けてください。")
