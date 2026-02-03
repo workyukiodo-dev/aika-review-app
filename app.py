@@ -8,9 +8,9 @@ st.title("💅 AIKA NAIL Review Concierge")
 st.write("本日はご来店ありがとうございました。今の率直な想いをお聞かせください。")
 
 # 入力フォーム
-q1 = st.text_area("1. 最近のお爪の調子はいかがですか？", placeholder="トラブルなく過ごせている安心感など")
-q2 = st.text_area("2. 本日のデザインや施術はいかがでしたか？", placeholder="お任せの心地よさや仕上がりの感想など")
-q3 = st.text_area("3. 今、指先を見てどんなお気持ちですか？", placeholder="明日からの活力や自分への投資の喜びなど")
+q1 = st.text_area("1. 最近のお爪の調子はいかがですか？")
+q2 = st.text_area("2. 本日のデザインや施術はいかがでしたか？")
+q3 = st.text_area("3. 今、指先を見てどんなお気持ちですか？")
 
 if st.button("クチコミ案を作成する"):
     if q1 and q2 and q3:
@@ -32,34 +32,36 @@ if st.button("クチコミ案を作成する"):
                 # 出力ノード llm_output を取得
                 review_all = result['data']['outputs']['llm_output']
                 
-                # --- UIの改善：Markdownとコード枠を分離 ---
-                st.success("クチコミ案が完成しました！")
-                
-                # --- 表示の整形（折り返し対応版） ---
                 st.success("クチコミ案が完成しました！")
                 
                 if "```text" in review_all:
                     parts = review_all.split("```text")
-                    header = parts[0]
-                    body = parts[1].replace("```", "").strip()
+                    header_part = parts[0]
+                    body_content = parts[1].replace("```", "").strip()
                     
-                    # 1. リンク部分をMarkdownで表示（青いリンクになります）
-                    st.markdown(header) 
+                    # 1. リンクをMarkdownで表示（青文字でクリック可能）
+                    st.markdown(header_part)
                     
-                    st.subheader("本文（以下をコピーして貼り付けてください）")
+                    # 2. 本文をコピーボタン付きで表示
+                    st.subheader("本文（右上のボタンでコピー！）")
+                    # st.codeに language=None を指定するとコピーボタンが出現します
+                    st.code(body_content, language=None)
                     
-                    # 2. 本文を「テキストエリア」で表示（自動で折り返され、コピーも簡単です）
-                    # heightで高さを調整できます。disabled=Trueで編集不可にしています。
-                    st.text_area(label="コピー用ボックス", value=body, height=200, disabled=False)
-                    
-                    st.info("↑ 枠内の文章を長押し（またはドラッグ）してコピーしてください。")
+                    # 💡スマホでの「折り返し」を強制するスタイル設定
+                    st.markdown("""
+                        <style>
+                        code {
+                            white-space : pre-wrap !important;
+                            word-break: break-all !important;
+                        }
+                        </style>
+                    """, unsafe_allow_html=True)
                 else:
-                    # 万が一分割に失敗した時のためのバックアップ表示
-                    st.text_area(label="クチコミ案", value=review_all, height=300)
+                    st.code(review_all, language=None)
                 
-                st.balloons() # 成功のお祝い
+                st.balloons()
                 
             except Exception as e:
-                st.error(f"接続エラーが発生しました。時間を置いて再度お試しください。")
+                st.error("接続エラーが発生しました。時間を置いて再度お試しください。")
     else:
         st.warning("すべてのご質問にお答えいただけますと幸いです。")
