@@ -5,17 +5,16 @@ import requests
 st.set_page_config(page_title="AIKA NAIL クチコミコンシェルジュ", page_icon="💅")
 
 st.title("💅 AIKA NAIL Review Concierge")
-st.write("本日はご来店ありがとうございました。指先の変化とともに、今の想いをお聞かせください。")
+st.write("本日はご来店ありがとうございました。今の率直な想いをお聞かせください。")
 
-# 入力欄
-q1 = st.text_area("1. 最近のお爪の調子はいかがですか？", placeholder="例：トラブルなく過ごせている安心感など")
-q2 = st.text_area("2. 本日のデザインや施術はいかがでしたか？", placeholder="例：お任せの心地よさや仕上がりの感想など")
-q3 = st.text_area("3. 今、指先を見てどんなお気持ちですか？", placeholder="例：明日からの活力になる喜びなど")
+# 入力フォーム
+q1 = st.text_area("1. 最近のお爪の調子はいかがですか？", placeholder="トラブルなく過ごせている安心感など")
+q2 = st.text_area("2. 本日のデザインや施術はいかがでしたか？", placeholder="お任せの心地よさや仕上がりの感想など")
+q3 = st.text_area("3. 今、指先を見てどんなお気持ちですか？", placeholder="明日からの活力や自分への投資の喜びなど")
 
 if st.button("クチコミ案を作成する"):
     if q1 and q2 and q3:
-        with st.spinner("AIが心を込めて文章を作成しています..."):
-            # --- ここにご自身のAPIキーを入れてください ---
+        with st.spinner("AIが品格のある文章を作成しています..."):
             api_key = "app-Eeu81CvERvLEhcrwsmn4VMZ7" 
             url = "https://api.dify.ai/v1/workflows/run"
             
@@ -30,33 +29,27 @@ if st.button("クチコミ案を作成する"):
                 response = requests.post(url, headers=headers, json=data)
                 result = response.json()
                 
-                # エラーチェック
-                if response.status_code != 200:
-                    st.error("現在、AIが少しお休みしています。時間をおいて再度お試しください。")
-                    st.write(result) # 開発中のみ表示
-                    st.stop()
-
                 # 出力ノード llm_output を取得
                 review_all = result['data']['outputs']['llm_output']
                 
-                # --- 表示の整形（Markdownリンクと本文を分ける） ---
+                # --- UIの改善：Markdownとコード枠を分離 ---
                 st.success("クチコミ案が完成しました！")
                 
-                # "```text" という文字で分割して、上半分をリンク、下半分をコピー枠にする
+                # "```text" という文字を境目に上下に分割する
                 if "```text" in review_all:
                     parts = review_all.split("```text")
-                    header = parts[0]
-                    body = parts[1].replace("```", "").strip()
+                    header_part = parts[0] # リンク部分
+                    body_part = parts[1].replace("```", "").strip() # 本文
                     
-                    st.markdown(header) # リンクを有効化して表示
-                    st.subheader("本文（以下をコピーして貼り付けてください）")
-                    st.code(body, language=None) # コピーしやすい枠
+                    st.markdown(header_part) # リンクを青文字で表示
+                    st.subheader("本文（コピーして貼り付けてください）")
+                    st.code(body_part, language=None) # コピーしやすい枠
                 else:
                     st.markdown(review_all)
                 
                 st.balloons() # 成功のお祝い
-
+                
             except Exception as e:
-                st.error(f"接続エラーが発生しました。オーナーにお知らせください。")
+                st.error(f"接続エラーが発生しました。時間を置いて再度お試しください。")
     else:
         st.warning("すべてのご質問にお答えいただけますと幸いです。")
